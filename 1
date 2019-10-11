@@ -1,0 +1,31 @@
+import vlc
+import sys
+import os
+from subprocess import Popen
+from time import sleep
+import RPi.GPIO as GPIO
+
+b1 = 16
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(b1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+instance = vlc.Instance('--input-repeat=-1', '--no-video-title-show', '--fullscreen', '--mouse-hide-timeout=0')
+player = instance.media_player_new()
+while True:
+    if player.get_state() != vlc.State.Playing:
+        print('Start playing')
+        Media = instance.media_new('/home/aleksey/Videos/1.mp4')
+        Media.get_mrl()
+        player.set_media(Media)
+        player.play()
+        sleep(1.5)
+    else:
+        print('Already playing, ignoring')
+    if GPIO.input(b1) == False:
+        print('Switching video')
+        Media = instance.media_new('/home/aleksey/Videos/2.mp4')
+        Media.get_mrl()
+        player.set_media(Media)
+        player.play()
+        sleep(1.5)
